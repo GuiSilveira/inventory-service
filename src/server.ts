@@ -139,7 +139,7 @@ fastify.post('/inventory/update', async (request, reply) => {
 // Inicializando o servidor Fastify
 const start = async () => {
     try {
-        await fastify.listen({ port: Number(APP_PORT) })
+        await fastify.listen({ port: Number(APP_PORT), host: '0.0.0.0' })
         console.log(`Inventory service running on http://localhost:${APP_PORT}`)
     } catch (err) {
         fastify.log.error(err)
