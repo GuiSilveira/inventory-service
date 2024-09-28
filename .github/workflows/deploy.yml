@@ -38,24 +38,28 @@ jobs:
                       fi
 
                       # Criar diretório de backup, se não existir
-                      mkdir -p ~/backup
+                      mkdir -p $HOME/backup
 
                       # Deploy do inventory-service
-                      if [ -d "~/inventory-system" ]; then
-                        cd ~/inventory-system
+                      if [ -d "$HOME/inventory-system" ]; then
+                        cd $HOME/inventory-system
 
-                        # Preservar o arquivo .env antes do pull
-                        mv .env ~/backup/env_backup || true
+                        # Preservar o arquivo .env antes do pull, se existir
+                        if [ -f ".env" ]; then
+                          mv .env $HOME/backup/env_inventory_backup
+                        fi
 
                         # Fazer o pull para atualizar o repositório
                         git pull origin main
                       else
-                        git clone https://github.com/GuiSilveira/inventory-service.git ~/inventory-system
-                        cd ~/inventory-system
+                        git clone https://github.com/GuiSilveira/inventory-service.git $HOME/inventory-system
+                        cd $HOME/inventory-system
                       fi
 
                       # Restaurar o arquivo .env do backup, se existir
-                      mv ~/backup/env_backup .env || true
+                      if [ -f "$HOME/backup/env_inventory_backup" ]; then
+                        mv $HOME/backup/env_inventory_backup .env
+                      fi
 
                       # Remover e reconstruir o diretório de build
                       rm -rf dist
