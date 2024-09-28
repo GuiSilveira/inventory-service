@@ -1,0 +1,8 @@
+node_modules
+dist
+.tool-versions
+.env
+inventory.db
+pnpm-lock.yaml
+yarn.lock
+package-lock.json

@@ -1,0 +1,57 @@
+name: Deploy Inventory Service to EC2 with PM2
+
+on:
+    push:
+        branches: [main] # Monitora a branch 'main'. Altere para a branch desejada.
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check out the repository
+              uses: actions/checkout@v3
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '20.17.0' # Define a versão do Node.js para 20.17.0 ou superior
+
+            - name: SSH into EC2 and deploy inventory-service with PM2
+              uses: appleboy/ssh-action@v0.1.2
+              with:
+                  host: ${{ secrets.EC2_HOST }}
+                  username: ${{ secrets.EC2_USER }}
+                  key: ${{ secrets.EC2_SSH_KEY }}
+                  port: 22
+                  script: |
+                      # Instalar Git se não estiver instalado
+                      sudo apt-get update
+                      sudo apt-get install -y git
+
+                      # Verificar se o PM2 já está instalado, caso contrário, instalar
+                      if ! command -v pm2 > /dev/null; then
+                        echo "PM2 não encontrado. Instalando..."
+                        sudo npm install -g pm2
+                      else
+                        echo "PM2 já está instalado."
+                      fi
+
+                      # Deploy do inventory-service
+                      if [ -d "~/inventory-system" ]; then
+                        cd ~/inventory-system
+                        git pull origin main
+                      else
+                        git clone https://github.com/<SEU_USUARIO>/<SEU_REPOSITORIO-INVENTORY>.git ~/inventory-system
+                        cd ~/inventory-system
+                      fi
+
+                      # Instalar dependências do inventory-service
+                      npm install
+
+                      # Compilar o TypeScript para JavaScript
+                      npm run build
+
+                      # Usar PM2 com o arquivo ecosystem.config.js para iniciar ou reiniciar os serviços
+                      pm2 startOrRestart ecosystem.config.js
+                      pm2 save
