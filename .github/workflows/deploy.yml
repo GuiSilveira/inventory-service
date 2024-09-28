@@ -37,19 +37,29 @@ jobs:
                         echo "PM2 já está instalado."
                       fi
 
+                      # Criar diretório de backup, se não existir
+                      mkdir -p ~/backup
+
                       # Deploy do inventory-service
                       if [ -d "~/inventory-system" ]; then
                         cd ~/inventory-system
+
+                        # Preservar o arquivo .env antes do pull
+                        mv .env ~/backup/env_backup || true
+
+                        # Fazer o pull para atualizar o repositório
                         git pull origin main
                       else
-                        git clone https://github.com/<SEU_USUARIO>/<SEU_REPOSITORIO-INVENTORY>.git ~/inventory-system
+                        git clone https://github.com/GuiSilveira/inventory-service.git ~/inventory-system
                         cd ~/inventory-system
                       fi
 
-                      # Instalar dependências do inventory-service
-                      npm install
+                      # Restaurar o arquivo .env do backup, se existir
+                      mv ~/backup/env_backup .env || true
 
-                      # Compilar o TypeScript para JavaScript
+                      # Remover e reconstruir o diretório de build
+                      rm -rf dist
+                      npm install
                       npm run build
 
                       # Usar PM2 com o arquivo ecosystem.config.js para iniciar ou reiniciar os serviços
