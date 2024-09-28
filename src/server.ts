@@ -84,6 +84,9 @@ client.onConnect = () => {
 // Endpoint para verificar o estoque
 fastify.get('/inventory/:productId', async (request, reply) => {
     const { productId } = request.params as { productId: string }
+
+    console.log(`Checking inventory for product ${productId}`)
+
     return new Promise((resolve, reject) => {
         db.get(
             'SELECT productId, productName, quantity FROM inventory WHERE productId = ?',
