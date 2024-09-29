@@ -103,6 +103,20 @@ fastify.get('/inventory/:productId', async (request, reply) => {
     })
 })
 
+// Endpoint para verificar o estoque completo
+fastify.get('/inventory', async (request, reply) => {
+    return new Promise((resolve, reject) => {
+        db.all('SELECT productId, productName, quantity FROM inventory', (err, rows) => {
+            if (err) {
+                reply.status(500).send({ error: 'Failed to fetch inventory' })
+                reject(err)
+            } else {
+                resolve(rows)
+            }
+        })
+    })
+})
+
 // Endpoint para adicionar um novo produto ao inventário
 fastify.post('/inventory/add', async (request, reply) => {
     const { productName, quantity } = request.body as { productName: string; quantity: number }
