@@ -29,9 +29,7 @@ const client = new Client({
 
 client.activate()
 // Criação da tabela de estoque com `productId` autoincrement
-// Criação da tabela de estoque com `productId` autoincrement
 db.serialize(() => {
-    db.run('DROP TABLE IF EXISTS inventory')
     db.run(`
     CREATE TABLE IF NOT EXISTS inventory (
       productId INTEGER PRIMARY KEY AUTOINCREMENT,
